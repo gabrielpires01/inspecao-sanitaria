@@ -1,7 +1,7 @@
+import bcrypt
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
@@ -9,16 +9,15 @@ from app.core.config import settings
 from app.core.database import get_db
 from app.models.user import User
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    return bcrypt.checkpw(plain_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(13))
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
@@ -36,10 +35,10 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 def verify_token(token: str, credentials_exception):
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        username: str | None = payload.get("sub")
-        if username is None:
+        email: str | None = payload.get("sub")
+        if email is None:
             raise credentials_exception
-        return username
+        return email
     except JWTError:
         raise credentials_exception
 
@@ -54,8 +53,8 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    username = verify_token(token, credentials_exception)
-    user = db.query(User).filter(User.username == username).first()
+    email = verify_token(token, credentials_exception)
+    user = db.query(User).filter(User.email == email).first()
 
     if user is None:
         raise credentials_exception
