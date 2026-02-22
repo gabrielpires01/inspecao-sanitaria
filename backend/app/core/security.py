@@ -12,12 +12,23 @@ from app.models.user import User
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
 
+def convert_str_to_byte(string):
+    return string.encode("utf-8")
+
+
+def hash_string(bytes):
+    return bcrypt.hashpw(bytes, bcrypt.gensalt(12))
+
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return bcrypt.checkpw(plain_password, hashed_password)
+    password_bytes = convert_str_to_byte(plain_password)
+    hashed_bytes = convert_str_to_byte(hashed_password.strip())
+
+    return bcrypt.checkpw(password_bytes, hashed_bytes)
 
 
 def get_password_hash(password: str) -> str:
-    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(13))
+    return bcrypt.hashpw(convert_str_to_byte(password), bcrypt.gensalt(12)).decode("utf-8")
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):

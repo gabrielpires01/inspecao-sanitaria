@@ -3,7 +3,6 @@ from datetime import datetime
 
 
 class UserBase(BaseModel):
-    username: str
     email: str
     full_name: str | None = None
 
@@ -34,3 +33,8 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
+
+
+class Login(BaseModel):
+    email: str
+    password: str

@@ -1,8 +1,7 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.core.database import get_db
-from app.models.user import User
+from app.core.deps import get_user_service
+from fastapi import APIRouter, HTTPException, status, Depends
 from app.schemas.user import UserResponse
 
 router = APIRouter()
@@ -12,20 +11,20 @@ router = APIRouter()
 async def read_users(
     skip: int = 0,
     limit: int = 100,
-    db: Session = Depends(get_db),
+    user_service: Session = Depends(get_user_service)
 ):
     """Lista todos os usuários (requer autenticação)"""
-    users = db.query(User).offset(skip).limit(limit).all()
+    users = user_service.get_users(skip, limit)
     return users
 
 
 @router.get("/{user_id}", response_model=UserResponse)
 async def read_user(
     user_id: int,
-    db: Session = Depends(get_db),
+    user_service: Session = Depends(get_user_service)
 ):
     """Obtém um usuário específico por ID"""
-    user = db.query(User).filter(User.id == user_id).first()
+    user = user_service.get_user(user_id)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
