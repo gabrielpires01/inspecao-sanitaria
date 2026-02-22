@@ -1,6 +1,5 @@
 from app.core.deps import get_auth_service
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.core.security import (
     get_current_user

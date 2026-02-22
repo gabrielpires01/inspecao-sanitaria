@@ -38,9 +38,8 @@ class AuthService:
         return db_user
 
     def login(self, form_data: OAuth2PasswordRequestForm):
-        user = self.db.query(User).filter(User.email == form_data.email).first()
+        user: User | None = self.db.query(User).filter(User.email == form_data.email).first()
 
-        print(user.hashed_password)
         if not user or not verify_password(form_data.password, user.hashed_password):
             return None
 
