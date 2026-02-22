@@ -1,13 +1,30 @@
-from app.enums import Status
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
+from app.enums import Status
+
+
+class InspectionBase(BaseModel):
+    establishment_id: int
+    inspector_id: int
+    date_time: Optional[datetime] = None
+    status: Status = Status.authorized
+
+
+class InspectionCreate(InspectionBase):
+    pass
 
 
 class InspectionUpdate(BaseModel):
-    status: Status
+    establishment_id: Optional[int] = None
+    inspector_id: Optional[int] = None
+    status: Optional[Status] = None
 
 
-class InspectionCreate(BaseModel):
-    establishment_id: int
-    inspector_id: int
-    data_time: datetime
+class InspectionResponse(InspectionBase):
+    id: int
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True

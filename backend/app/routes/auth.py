@@ -1,11 +1,13 @@
+from typing import Annotated
 from app.core.deps import get_auth_service
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.core.security import (
     get_current_user
 )
 from app.models.user import User
-from app.schemas.user import Login, Token, UserResponse, UserCreate
+from app.schemas.user import Token, UserResponse, UserCreate
 
 router = APIRouter()
 
@@ -17,7 +19,8 @@ router = APIRouter()
 )
 async def register(
     user_data: UserCreate,
-    auth_service: Session = Depends(get_auth_service)
+    auth_service: Session = Depends(get_auth_service),
+    current_user: User = Depends(get_current_user)
 ):
     """Registra um novo usuário"""
 
@@ -33,8 +36,8 @@ async def register(
 
 @router.post("/login", response_model=Token)
 async def login(
-    form_data: Login,
-    auth_service: Session = Depends(get_auth_service)
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    auth_service: Session = Depends(get_auth_service),
 ):
     """Autentica usuário e retorna token"""
     response = auth_service.login(form_data)

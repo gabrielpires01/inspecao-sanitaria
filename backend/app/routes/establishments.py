@@ -7,6 +7,10 @@ from app.schemas.establishment import (
     EstablishmentUpdate,
     EstablishmentResponse
 )
+from app.core.security import (
+    get_current_user
+)
+from app.models.user import User
 
 router = APIRouter()
 
@@ -19,6 +23,7 @@ router = APIRouter()
 async def create_establishment(
     establishment_data: EstablishmentCreate,
     establishment_service: Session = Depends(get_establishment_service),
+    current_user: User = Depends(get_current_user)
 ):
     """Cria um novo estabelecimento"""
     establishment = establishment_service.create(establishment_data)
@@ -30,6 +35,7 @@ async def list_establishments(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
     establishment_service: Session = Depends(get_establishment_service),
+    current_user: User = Depends(get_current_user)
 ):
     """Lista todos os estabelecimentos com paginação"""
     establishments = establishment_service.get_all(skip=skip, limit=limit)
@@ -40,6 +46,7 @@ async def list_establishments(
 async def search_establishments(
     name: str = Query(..., min_length=1),
     establishment_service: Session = Depends(get_establishment_service),
+    current_user: User = Depends(get_current_user)
 ):
     """Busca estabelecimentos por nome"""
     establishments = establishment_service.search_by_name(name)
@@ -50,6 +57,7 @@ async def search_establishments(
 async def get_establishment(
     establishment_id: int,
     establishment_service: Session = Depends(get_establishment_service),
+    current_user: User = Depends(get_current_user)
 ):
     """Obtém um estabelecimento específico por ID"""
     establishment = establishment_service.get_by_id(establishment_id)
@@ -66,6 +74,7 @@ async def update_establishment(
     establishment_id: int,
     establishment_data: EstablishmentUpdate,
     establishment_service: Session = Depends(get_establishment_service),
+    current_user: User = Depends(get_current_user)
 ):
     """Atualiza um estabelecimento"""
     establishment = establishment_service.update(
@@ -83,6 +92,7 @@ async def update_establishment(
 async def delete_establishment(
     establishment_id: int,
     establishment_service: Session = Depends(get_establishment_service),
+    current_user: User = Depends(get_current_user)
 ):
     """Deleta um estabelecimento"""
     success = establishment_service.delete(establishment_id)

@@ -1,3 +1,4 @@
+from app.enums import RoleEnum
 import bcrypt
 from datetime import datetime, timedelta
 from typing import Optional
@@ -58,9 +59,10 @@ def verify_token(token: str, credentials_exception):
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
         email: str | None = payload.get("sub")
+        role: int | None = payload.get("role")
         if email is None:
             raise credentials_exception
-        return email
+        return email, role
     except JWTError:
         raise credentials_exception
 
@@ -79,7 +81,7 @@ async def get_current_user(
 ) -> User:
     credentials_exception = get_credentials_exception()
 
-    email = verify_token(token, credentials_exception)
+    email, _role = verify_token(token, credentials_exception)
     user = db.query(User).filter(User.email == email).first()
 
     if user is None:
@@ -95,6 +97,11 @@ PUBLIC_ROUTES = [
     "/openapi.json",
     "/",
     "/health",
+]
+
+SUPERUSER_ROUTES = [
+    ("/api/establishments", "DELETE"),
+    ("/api/inspections", "DELETE"),
 ]
 
 
@@ -113,12 +120,20 @@ class AuthMiddleware(BaseHTTPMiddleware):
         try:
             token = auth.split(" ")[1]
             credentials_exception = get_credentials_exception()
-            email = verify_token(token, credentials_exception)
+            email, role = verify_token(token, credentials_exception)
             if not email:
                 return JSONResponse(
                     {"detail": "Não foi possível validar as credenciais"},
                     status_code=status.HTTP_401_UNAUTHORIZED
                 )
+
+            url_method = (request.url.path, request.method)
+            if url_method in SUPERUSER_ROUTES and role != RoleEnum.superuser.value:
+                return JSONResponse(
+                    {"detail": "Usuário não possui autorização suficiente"},
+                    status_code=status.HTTP_401_UNAUTHORIZED
+                )
+
         except (HTTPException, JWTError, IndexError, ValueError):
             return JSONResponse(
                 {"detail": "Não foi possível validar as credenciais"},

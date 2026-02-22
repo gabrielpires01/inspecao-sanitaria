@@ -38,14 +38,14 @@ class AuthService:
         return db_user
 
     def login(self, form_data: OAuth2PasswordRequestForm):
-        user: User | None = self.db.query(User).filter(User.email == form_data.email).first()
+        user: User | None = self.db.query(User).filter(User.username == form_data.username).first()
 
         if not user or not verify_password(form_data.password, user.hashed_password):
             return None
 
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
-            data={"sub": user.email},
+            data={"sub": user.email, "role": user.role.value},
             expires_delta=access_token_expires
         )
 

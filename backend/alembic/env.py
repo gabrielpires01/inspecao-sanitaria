@@ -1,6 +1,7 @@
 import app.models
 from logging.config import fileConfig
 
+from alembic.script import ScriptDirectory
 from app.core.config import settings
 from app.core.database import Base
 from sqlalchemy import engine_from_config
@@ -33,6 +34,24 @@ if db_url:
 # ... etc.
 
 
+def render_item(type_, obj, autogen_context):
+    if type_ == 'type' and hasattr(obj, '__module__') and 'app.core.decorators' in obj.__module__:
+        autogen_context.imports.add("import app.core.decorators")
+
+    return False
+
+
+def process_revision_directives(context, revision, directives):
+    script = ScriptDirectory.from_config(context.config)
+
+    existing_revisions = list(script.walk_revisions())
+    next_seq = len(existing_revisions) + 1
+
+    for directive in directives:
+        if directive.rev_id:
+            directive.rev_id = f"{next_seq:04d}_{directive.rev_id}_migration"
+
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -52,6 +71,9 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        process_revision_directives=process_revision_directives,
+        render_item=render_item,
+        user_module_prefix="app.core.decorators."
     )
 
     with context.begin_transaction():
@@ -73,7 +95,11 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            process_revision_directives=process_revision_directives,
+            render_item=render_item,
+            user_module_prefix="app.core.decorators."
         )
 
         with context.begin_transaction():

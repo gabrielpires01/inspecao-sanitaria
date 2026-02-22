@@ -3,6 +3,7 @@ from app.core.database import get_db
 from app.services.users import UserService
 from app.services.auth import AuthService
 from app.services.establishments import EstablishmentService
+from app.services.inspections import InspectionService
 
 
 def get_user_service(db=Depends(get_db)) -> UserService:
@@ -17,3 +18,9 @@ def get_establishment_service(
     db=Depends(get_db)
 ) -> EstablishmentService:
     return EstablishmentService(db=db)
+
+
+def get_inspection_service(
+    db=Depends(get_db)
+) -> InspectionService:
+    return InspectionService(db=db)
