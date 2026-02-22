@@ -1,9 +1,10 @@
 import datetime
 from app.enums import Status
-from sqlalchemy import Integer, String, DateTime, Enum, ForeignKey
+from sqlalchemy import Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 from app.core.database import Base
+from app.core.decorators import IntEnum
 
 
 class Establishments(Base):
@@ -15,7 +16,6 @@ class Establishments(Base):
     cep: Mapped[str] = mapped_column(String(9), nullable=True)
     city: Mapped[str] = mapped_column(String(100), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), onupdate=func.now())
 
 
 class Inspections(Base):
@@ -25,6 +25,5 @@ class Inspections(Base):
     establishment_id: Mapped[int] = mapped_column(Integer, ForeignKey("establishments.id"))
     inspector_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     date_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    status: Mapped[int] = mapped_column(Enum(Status), default=Status.authorized)
+    status: Mapped[int] = mapped_column(IntEnum(Status), default=Status.authorized)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

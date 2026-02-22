@@ -5,7 +5,8 @@ from datetime import datetime
 
 class UserBase(BaseModel):
     email: str
-    full_name: str | None = None
+    full_name: str
+    username: str
     role: RoleEnum = RoleEnum.inspector
 
 
@@ -16,13 +17,13 @@ class UserCreate(UserBase):
 class UserUpdate(BaseModel):
     email: str | None = None
     full_name: str | None = None
+    username: str | None = None
     password: str | None = None
 
 
 class UserResponse(UserBase):
     id: int
     created_at: datetime
-    updated_at: datetime | None = None
 
     class Config:
         from_attributes = True

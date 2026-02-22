@@ -27,7 +27,6 @@ def upgrade() -> None:
     sa.Column('cep', sa.String(length=9), nullable=True),
     sa.Column('city', sa.String(length=100), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_establishments_id'), 'establishments', ['id'], unique=False)
@@ -40,7 +39,6 @@ def upgrade() -> None:
     sa.Column('full_name', sa.String(), nullable=True),
     sa.Column('role', app.core.decorators.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('username')
     )
@@ -53,7 +51,6 @@ def upgrade() -> None:
     sa.Column('date_time', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('status', sa.Enum('authorized', 'has_irregularities', 'finalized', 'finalized_prohibition', 'finalized_partial_prohibition', name='status'), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['establishment_id'], ['establishments.id'], ),
     sa.ForeignKeyConstraint(['inspector_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')

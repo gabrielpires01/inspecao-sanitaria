@@ -1,14 +1,14 @@
-from enum import Enum
+from enum import IntEnum
 
 
-class RoleEnum(Enum):
-    superuser = 1, "superuser"
-    inspector = 2, "inspector"
+class RoleEnum(IntEnum):
+    superuser = 1
+    inspector = 2
 
 
-class Status(Enum):
-    authorized = 1, "authorized"
-    has_irregularities = 2, "has_irregularities"
-    finalized = 3, "finalized"
-    finalized_prohibition = 4, "finalized_prohibition"
-    finalized_partial_prohibition = 4, "finalized_partial_prohibition"
+class Status(IntEnum):
+    authorized = 1
+    has_irregularities = 2
+    finalized = 3
+    finalized_prohibition = 4
+    finalized_partial_prohibition = 5

@@ -24,7 +24,7 @@ class IntEnum(TypeDecorator):
     def process_result_value(self, value, dialect):
         if value is None:
             return None
-        enum_dict = {v.value[0]: v.name for v in self._enumtype}
+        enum_dict = {v.value: v.name for v in self._enumtype}
         try:
             return getattr(self._enumtype, enum_dict[value])
         except KeyError:

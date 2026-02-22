@@ -17,4 +17,3 @@ class User(Base):
     full_name: Mapped[str] = mapped_column(String, nullable=True)
     role: Mapped[int] = mapped_column(IntEnum(RoleEnum), default=RoleEnum.inspector)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), onupdate=func.now())

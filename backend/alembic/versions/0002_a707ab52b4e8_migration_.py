@@ -34,7 +34,6 @@ def upgrade() -> None:
             sa.Column('email', sa.String(100), nullable=False),
             sa.Column('role', app.core.decorators.Integer(), nullable=False),
             sa.Column('hashed_password', sa.String(255), nullable=False),
-            sa.Column('updated_at', sa.DateTime(), nullable=False, default=datetime.now),
             sa.Column('created_at', sa.DateTime(), nullable=False, default=datetime.now),
         ),
         [

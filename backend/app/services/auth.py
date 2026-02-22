@@ -24,11 +24,11 @@ class AuthService:
             return None
 
         hashed_password = get_password_hash(user_data.password)
-        print(hashed_password)
         db_user = User(
             email=user_data.email,
             hashed_password=hashed_password,
             full_name=user_data.full_name,
+            username=user_data.username
         )
 
         self.db.add(db_user)
