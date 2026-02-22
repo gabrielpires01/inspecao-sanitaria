@@ -3,9 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.routes import auth, users
-
-Base.metadata.create_all(bind=engine)
+from app.routes import auth, users, establishments
 
 app = FastAPI(
     title="API Inspeção Sanitária",
@@ -27,6 +25,11 @@ app.add_middleware(
 
 app.include_router(auth.router, prefix="/api/auth", tags=["Autenticação"])
 app.include_router(users.router, prefix="/api/users", tags=["Usuários"])
+app.include_router(
+    establishments.router,
+    prefix="/api/establishments",
+    tags=["Estabelecimentos"]
+)
 
 
 @app.get("/")

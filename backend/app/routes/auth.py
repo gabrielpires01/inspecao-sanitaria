@@ -10,7 +10,11 @@ from app.schemas.user import Login, Token, UserResponse, UserCreate
 router = APIRouter()
 
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register",
+    response_model=UserResponse,
+    status_code=status.HTTP_201_CREATED
+)
 async def register(
     user_data: UserCreate,
     auth_service: Session = Depends(get_auth_service)

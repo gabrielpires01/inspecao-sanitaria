@@ -1,3 +1,4 @@
+from app.enums import RoleEnum
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -5,6 +6,7 @@ from datetime import datetime
 class UserBase(BaseModel):
     email: str
     full_name: str | None = None
+    role: RoleEnum = RoleEnum.inspector
 
 
 class UserCreate(UserBase):
