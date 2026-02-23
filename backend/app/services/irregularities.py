@@ -22,7 +22,7 @@ class IrregularityService:
         self, irregularity_data: IrregularityCreateSchema
     ) -> IrregularityResponse:
         """Cria uma nova irregularidade"""
-        db_irregularity = Irregularities(**irregularity_data.model_dump())
+        db_irregularity = Irregularities(**irregularity_data.model_dump(exclude={'id'}))
         self.db.add(db_irregularity)
 
         if db_irregularity:

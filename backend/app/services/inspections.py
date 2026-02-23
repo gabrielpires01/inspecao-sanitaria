@@ -28,7 +28,7 @@ class InspectionService:
         self, inspection_data: InspectionCreateService
     ) -> InspectionResponse:
         """Cria uma nova inspeção"""
-        db_inspection = Inspections(**inspection_data.model_dump())
+        db_inspection = Inspections(**inspection_data.model_dump(exclude={'id'}))
         self.db.add(db_inspection)
         self.db.commit()
         self.db.refresh(db_inspection)
@@ -146,7 +146,7 @@ class InspectionService:
 
     def finalize_inspection(self, finalization_data: FinalizeInspectionService):
         """Finaliza uma inspeção"""
-        log = FinalizationLog(**finalization_data.model_dump())
+        log = FinalizationLog(**finalization_data.model_dump(exclude={'id'}))
 
         self.db.add(log)
         status = Status.finalized

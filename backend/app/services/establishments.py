@@ -16,7 +16,7 @@ class EstablishmentService:
         self, establishment_data: EstablishmentCreate
     ) -> EstablishmentResponse:
         """Cria um novo estabelecimento"""
-        db_establishment = Establishments(**establishment_data.model_dump())
+        db_establishment = Establishments(**establishment_data.model_dump(exclude={'id'}))
         self.db.add(db_establishment)
         self.db.commit()
         self.db.refresh(db_establishment)
