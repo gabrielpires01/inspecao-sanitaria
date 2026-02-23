@@ -1,4 +1,5 @@
 from typing import List
+from app.models.inspection import InspectionLog
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 from app.core.deps import get_inspection_service
@@ -7,8 +8,8 @@ from app.models.user import User
 from app.schemas.inspection import (
     InspectionCreate,
     InspectionCreateService,
-    InspectionUpdate,
-    InspectionResponse
+    InspectionResponse,
+    LogResponse
 )
 
 router = APIRouter()
@@ -75,8 +76,8 @@ async def get_inspections_by_inspector(
 
 
 @router.get(
-    "/{inspection_id}/logs",
-    response_model=List[InspectionResponse]
+    "/logs/{inspection_id}",
+    response_model=List[LogResponse]
 )
 async def get_logs_by_inspection(
     inspection_id: int,

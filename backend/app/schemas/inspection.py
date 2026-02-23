@@ -30,3 +30,14 @@ class InspectionResponse(InspectionBase):
 
     class Config:
         from_attributes = True
+
+
+class LogResponse(BaseModel):
+    id: int
+    inspection_id: int
+    old_status: Status
+    new_status: Status
+    date_time: datetime
+
+    class Config:
+        from_attributes = True
