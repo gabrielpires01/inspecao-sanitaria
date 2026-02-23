@@ -7,6 +7,7 @@ Projeto full-stack para gestão de inspeções sanitárias, desenvolvido com Fas
 
 ![Imagem da Modelagem do Sistema](/images/modelagem.png)
 ![Representacao do Fluxo Padrão](/images/fluxo.png)
+![Coverage Testes Backend](/images/coverage.png)
 
 
 ## 🚀 Tecnologias
