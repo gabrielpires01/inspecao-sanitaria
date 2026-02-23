@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
-from app.enums import Status
+from app.enums import FinalizeStatus, Status
 
 
 class InspectionBase(BaseModel):
@@ -41,3 +41,9 @@ class LogResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class FinalizeInspection(BaseModel):
+    inspection_id: int
+    status: FinalizeStatus
+    date_time: datetime

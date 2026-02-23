@@ -17,3 +17,14 @@ class Irregularities(Base):
     severity: Mapped[int] = mapped_column(IntEnum(Severity), default=Severity.moderate)
     requires_interruption: Mapped[bool] = mapped_column(Boolean(), default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class IrregularitiesLog(Base):
+    __tablename__ = "irregularities_log"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    irregularity_id: Mapped[int] = mapped_column(Integer, ForeignKey("irregularities.id"))
+    inspector_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    old_severity: Mapped[int] = mapped_column(IntEnum(Severity), default=Severity.moderate)
+    new_severity: Mapped[int] = mapped_column(IntEnum(Severity), default=Severity.moderate)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

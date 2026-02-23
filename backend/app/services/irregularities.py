@@ -1,11 +1,11 @@
 from typing import List, Optional
-from app.mapper import SEVERITY_TO_STATUS
+from app.enums import Status
 from app.models.inspection import Inspections
 from app.schemas.inspection import InspectionUpdate
 from app.services.inspections import InspectionService
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from app.models.irregularity import Irregularities
+from app.models.irregularity import Irregularities, IrregularitiesLog
 from app.schemas.irregularity import (
     IrregularityCreateSchema,
     IrregularityUpdate,
@@ -25,12 +25,8 @@ class IrregularityService:
         db_irregularity = Irregularities(**irregularity_data.model_dump())
         self.db.add(db_irregularity)
 
-        status = SEVERITY_TO_STATUS[db_irregularity.severity]
         if db_irregularity:
-            inspection_update = self.inspection_service.update(
-                db_irregularity.inspection_id,
-                InspectionUpdate(status=status)
-            )
+            inspection_update = self._update_inspection(db_irregularity)
             if not inspection_update or isinstance(inspection_update, ValueError):
                 self.db.rollback()
                 return inspection_update
@@ -39,12 +35,37 @@ class IrregularityService:
         self.db.refresh(db_irregularity)
         return db_irregularity
 
+    def _update_inspection(self, irregularity: Irregularities) -> Inspections:
+        requires_interruption = irregularity.requires_interruption
+        status = Status.has_irregularities
+        if requires_interruption:
+            status = Status.immediate_prohibition
+
+        inspection_update = self.inspection_service.update(
+            irregularity.inspection_id,
+            InspectionUpdate(status=status)
+        )
+        return inspection_update
+
     def get_all(
         self, skip: int = 0, limit: int = 100
     ) -> List[IrregularityResponse]:
         """Lista todas as irregularidades com paginação"""
         stmt = (
             select(Irregularities)
+            .offset(skip)
+            .limit(limit)
+        )
+        irregularities = self.db.scalars(stmt).all()
+        return irregularities
+
+    def get_all_logs_by_irregularity(
+            self, irregularity_id: int, skip: int = 0, limit: int = 100
+    ) -> List[IrregularityResponse]:
+        """Lista todas os logs de uma irregularidades com paginação"""
+        stmt = (
+            select(IrregularitiesLog)
+            .where(IrregularitiesLog.irregularity_id == irregularity_id)
             .offset(skip)
             .limit(limit)
         )
@@ -93,11 +114,25 @@ class IrregularityService:
             return None
 
         update_data = irregularity_data.model_dump(exclude_unset=True)
+        old_severity = db_irregularity.severity
+        new_severity = update_data["severity"]
         for field, value in update_data.items():
             setattr(db_irregularity, field, value)
 
+        irregularity_log = IrregularitiesLog(
+            irregularity_id=irregularity_id,
+            inspector_id=db_irregularity.inspector_id,
+            new_severity=new_severity,
+            old_severity=old_severity
+        )
+
+        self.db.add(irregularity_log)
         self.db.commit()
         self.db.refresh(db_irregularity)
+        self.db.refresh(irregularity_log)
+
+        self._update_inspection(db_irregularity)
+
         return db_irregularity
 
     def delete(self, irregularity_id: int) -> bool:

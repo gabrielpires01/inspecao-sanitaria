@@ -1,5 +1,4 @@
 from typing import List
-from app.models.inspection import InspectionLog
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 from app.core.deps import get_inspection_service

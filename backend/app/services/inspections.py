@@ -4,7 +4,8 @@ from sqlalchemy import select
 from app.models.inspection import InspectionLog, Inspections
 from app.enums import Status
 from app.schemas.inspection import (
-    InspectionCreate,
+    FinalizeInspection,
+    InspectionCreateService,
     InspectionUpdate,
     InspectionResponse
 )
@@ -24,7 +25,7 @@ class InspectionService:
         return status in finalized_statuses
 
     def create(
-        self, inspection_data: InspectionCreate
+        self, inspection_data: InspectionCreateService
     ) -> InspectionResponse:
         """Cria uma nova inspeção"""
         db_inspection = Inspections(**inspection_data.model_dump())
@@ -96,10 +97,8 @@ class InspectionService:
             setattr(db_inspection, field, value)
 
         log = None
-        if new_status and new_status.value > old_status.value:
-            log = self.add_update_log(inspection_id, old_status, new_status)
-        else:
-            setattr(db_inspection, "status", old_status)
+        if new_status:
+            log = self.add_update_log(db_inspection.inspector_id, inspection_id, old_status, new_status)
 
         self.db.commit()
         self.db.refresh(db_inspection)
@@ -123,18 +122,20 @@ class InspectionService:
         self.db.commit()
         return True
 
-    def add_update_log(self, inspection_id, old_status, new_status) -> InspectionLog:
+    def add_update_log(self, inspector_id, inspection_id, old_status, new_status) -> InspectionLog:
         """Atualiza log da inspeção"""
         update_log = InspectionLog(**{
             "old_status": old_status,
             "new_status": new_status,
-            "inspection_id": inspection_id
+            "inspection_id": inspection_id,
+            "inspector_id": inspector_id
         })
 
         self.db.add(update_log)
         return update_log
 
     def get_logs_by_inspection(self, inspection_id) -> List[InspectionLog]:
+        """Busca logs de inspeção por inspeção"""
         stmt = (
             select(InspectionLog)
             .where(InspectionLog.inspection_id == inspection_id)
@@ -142,3 +143,6 @@ class InspectionService:
 
         logs = self.db.scalars(stmt).all()
         return logs
+
+    def finalize_inspection(self, finalization_data: FinalizeInspection):
+        """Finaliza uma inspeção"""

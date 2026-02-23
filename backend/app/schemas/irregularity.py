@@ -20,8 +20,14 @@ class IrregularityCreateSchema(IrregularityBase):
 
 
 class IrregularityUpdate(BaseModel):
-    description: Optional[int] = None
+    description: Optional[str] = None
     severity: Optional[Severity] = None
+
+
+class IrregularityUpdateSchema(BaseModel):
+    description: Optional[str] = None
+    severity: Optional[Severity] = None
+    inspector_id: int
 
 
 class IrregularityResponse(IrregularityBase):
@@ -30,3 +36,16 @@ class IrregularityResponse(IrregularityBase):
 
     class Config:
         from_attributes = True
+
+
+class IrregularityResolve(BaseModel):
+    description: str
+
+
+class IrregularityLogsResponse(BaseModel):
+    id: int
+    irregularity_id: int
+    inspector_id: int
+    old_severity: int
+    new_severity: int
+    created_at: datetime
