@@ -96,6 +96,20 @@ async def get_irregularities_by_inspector(
     return irregularities
 
 
+@router.get(
+    "/inspection/{inspection_id}",
+    response_model=List[IrregularityResponse]
+)
+async def get_irregularities_by_inspection(
+    inspection_id: int,
+    irregularity_service: Session = Depends(get_irregularity_service),
+    current_user: User = Depends(get_current_user)
+):
+    """Busca irregularidades por inspeção"""
+    irregularities = irregularity_service.get_by_inspection(inspection_id)
+    return irregularities
+
+
 @router.get("/{irregularity_id}", response_model=IrregularityResponse)
 async def get_irregularity(
     irregularity_id: int,

@@ -1,0 +1,88 @@
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:active {
+  transform: scale(0.98);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.id {
+  font-size: 18px;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status1 {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status2 {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status3 {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status4,
+.status5,
+.status6 {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  font-size: 14px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.row strong {
+  color: #333;
+  min-width: 100px;
+}
+
+.establishmentName,
+.inspectorName {
+  font-weight: 600;
+  color: #667eea;
+}
+
+.loading {
+  color: #999;
+  font-style: italic;
+}

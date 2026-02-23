@@ -103,6 +103,17 @@ class IrregularityService:
 
         return irregularities
 
+    def get_by_inspection(
+        self, inspection_id: int
+    ) -> List[IrregularityResponse]:
+        """Busca irregularidades por inspeção"""
+        stmt = (
+            select(Irregularities)
+            .where(Irregularities.inspection_id == inspection_id)
+        )
+        irregularities = self.db.scalars(stmt).all()
+        return irregularities
+
     def update(
         self,
         irregularity_id: int,

@@ -20,6 +20,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(AuthMiddleware)
 
 
 app.include_router(auth.router, prefix="/api/auth", tags=["Autenticação"])

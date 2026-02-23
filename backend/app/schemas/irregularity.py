@@ -32,6 +32,7 @@ class IrregularityUpdateSchema(BaseModel):
 
 class IrregularityResponse(IrregularityBase):
     id: int
+    inspector_id: int
     created_at: datetime
 
     class Config:

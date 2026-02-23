@@ -107,6 +107,9 @@ SUPERUSER_ROUTES = [
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        if request.method == "OPTIONS":
+            return await call_next(request)
+
         if request.url.path in PUBLIC_ROUTES:
             return await call_next(request)
 

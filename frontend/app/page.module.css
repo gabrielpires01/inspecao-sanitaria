@@ -1,0 +1,158 @@
+.container {
+  min-height: 100vh;
+  padding-bottom: 20px;
+}
+
+.header {
+  background: white;
+  padding: 16px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.logoutButton {
+  padding: 8px 16px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.logoutButton:hover {
+  background: #c82333;
+}
+
+.actions {
+  padding: 20px;
+}
+
+.newButton {
+  width: 100%;
+  padding: 16px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.newButton:hover {
+  background: #218838;
+}
+
+.list {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:active {
+  transform: scale(0.98);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.cardId {
+  font-size: 18px;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status1 {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status2 {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status3 {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status4,
+.status5,
+.status6 {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cardRow {
+  font-size: 14px;
+  color: #555;
+}
+
+.cardRow strong {
+  color: #333;
+  margin-right: 8px;
+}
+
+.loading,
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-size: 16px;
+}
+
+.error {
+  margin: 20px;
+  padding: 12px;
+  background: #fee;
+  color: #c33;
+  border-radius: 8px;
+  text-align: center;
+}
