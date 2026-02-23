@@ -2,7 +2,7 @@ from app.core.security import AuthMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.routes import auth, users, establishments, inspections
+from app.routes import auth, irregularities, users, establishments, inspections
 
 app = FastAPI(
     title="API Inspeção Sanitária",
@@ -33,6 +33,11 @@ app.include_router(
     inspections.router,
     prefix="/api/inspections",
     tags=["Inspeções"]
+)
+app.include_router(
+    irregularities.router,
+    prefix="/api/irregularities",
+    tags=["Irregularidades"]
 )
 
 

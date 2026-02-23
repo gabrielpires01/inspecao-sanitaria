@@ -6,6 +6,7 @@ from app.core.security import get_current_user
 from app.models.user import User
 from app.schemas.inspection import (
     InspectionCreate,
+    InspectionCreateService,
     InspectionUpdate,
     InspectionResponse
 )
@@ -24,7 +25,12 @@ async def create_inspection(
     current_user: User = Depends(get_current_user)
 ):
     """Cria uma nova inspeção"""
-    inspection = inspection_service.create(inspection_data)
+    dict_data = dict(inspection_data)
+
+    inspection = inspection_service.create(InspectionCreateService(
+        **dict_data,
+        inspector_id=current_user.id
+    ))
     return inspection
 
 
@@ -68,6 +74,20 @@ async def get_inspections_by_inspector(
     return inspections
 
 
+@router.get(
+    "/{inspection_id}/logs",
+    response_model=List[InspectionResponse]
+)
+async def get_logs_by_inspection(
+    inspection_id: int,
+    inspection_service: Session = Depends(get_inspection_service),
+    current_user: User = Depends(get_current_user)
+):
+    """Busca logs por inspeção"""
+    inspections = inspection_service.get_logs_by_inspection(inspection_id)
+    return inspections
+
+
 @router.get("/{inspection_id}", response_model=InspectionResponse)
 async def get_inspection(
     inspection_id: int,
@@ -82,31 +102,6 @@ async def get_inspection(
             detail="Inspeção não encontrada"
         )
     return inspection
-
-
-@router.put("/{inspection_id}", response_model=InspectionResponse)
-async def update_inspection(
-    inspection_id: int,
-    inspection_data: InspectionUpdate,
-    inspection_service: Session = Depends(get_inspection_service),
-    current_user: User = Depends(get_current_user)
-):
-    """Atualiza uma inspeção (não permite se estiver finalizada)"""
-    try:
-        inspection = inspection_service.update(
-            inspection_id, inspection_data
-        )
-        if not inspection:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Inspeção não encontrada"
-            )
-        return inspection
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
 
 
 @router.delete("/{inspection_id}", status_code=status.HTTP_204_NO_CONTENT)

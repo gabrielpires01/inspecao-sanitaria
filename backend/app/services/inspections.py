@@ -1,6 +1,7 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from app.models.inspection import Inspections
+from sqlalchemy import select
+from app.models.inspection import InspectionLog, Inspections
 from app.enums import Status
 from app.schemas.inspection import (
     InspectionCreate,
@@ -55,29 +56,29 @@ class InspectionService:
         self, establishment_id: int
     ) -> List[InspectionResponse]:
         """Busca inspeções por estabelecimento"""
-        inspections = (
-            self.db.query(Inspections)
-            .filter(Inspections.establishment_id == establishment_id)
-            .all()
+        stmt = (
+            select(Inspections)
+            .where(Inspections.establishment_id == establishment_id)
         )
+        inspections = self.db.scalars(stmt).all()
         return inspections
 
     def get_by_inspector(
         self, inspector_id: int
     ) -> List[InspectionResponse]:
         """Busca inspeções por inspetor"""
-        inspections = (
-            self.db.query(Inspections)
-            .filter(Inspections.inspector_id == inspector_id)
-            .all()
+        stmt = (
+            select(Inspections)
+            .where(Inspections.inspector_id == inspector_id)
         )
+        inspections = self.db.scalars(stmt).all()
         return inspections
 
     def update(
         self,
         inspection_id: int,
         inspection_data: InspectionUpdate
-    ) -> Optional[InspectionResponse]:
+    ) -> Optional[InspectionResponse | ValueError]:
         """Atualiza uma inspeção (não permite se estiver finalizada)"""
         db_inspection = self.db.get(Inspections, inspection_id)
         if not db_inspection:
@@ -88,12 +89,23 @@ class InspectionService:
                 "Não é permitido alterar inspeções finalizadas"
             )
 
+        old_status = db_inspection.status
+        new_status = inspection_data.status
         update_data = inspection_data.model_dump(exclude_unset=True)
         for field, value in update_data.items():
             setattr(db_inspection, field, value)
 
+        log = None
+        if new_status and new_status.value > old_status.value:
+            log = self.add_update_log(inspection_id, old_status, new_status)
+        else:
+            setattr(db_inspection, "status", old_status)
+
         self.db.commit()
         self.db.refresh(db_inspection)
+        if log:
+            self.db.refresh(log)
+
         return db_inspection
 
     def delete(self, inspection_id: int) -> bool:
@@ -110,3 +122,23 @@ class InspectionService:
         self.db.delete(db_inspection)
         self.db.commit()
         return True
+
+    def add_update_log(self, inspection_id, old_status, new_status) -> InspectionLog:
+        """Atualiza log da inspeção"""
+        update_log = InspectionLog(**{
+            "old_status": old_status,
+            "new_status": new_status,
+            "inspection_id": inspection_id
+        })
+
+        self.db.add(update_log)
+        return update_log
+
+    def get_logs_by_inspection(self, inspection_id) -> List[InspectionLog]:
+        stmt = (
+            select(InspectionLog)
+            .where(InspectionLog.inspection_id == inspection_id)
+        )
+
+        logs = self.db.scalars(stmt).all()
+        return logs

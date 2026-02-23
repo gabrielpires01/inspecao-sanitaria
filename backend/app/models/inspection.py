@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from app.enums import Status
 from sqlalchemy import Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
@@ -25,5 +25,15 @@ class Inspections(Base):
     establishment_id: Mapped[int] = mapped_column(Integer, ForeignKey("establishments.id"))
     inspector_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     date_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    status: Mapped[int] = mapped_column(IntEnum(Status), default=Status.authorized)
+    status: Mapped[int] = mapped_column(IntEnum(Status), default=Status.clear)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class InspectionLog(Base):
+    __tablename__ = "inspection_log"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    inspection_id: Mapped[int] = mapped_column(Integer, ForeignKey("inspections.id"))
+    old_status: Mapped[int] = mapped_column(IntEnum(Status), default=Status.clear)
+    new_status: Mapped[int] = mapped_column(IntEnum(Status), default=Status.clear)
+    date_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.now, server_default=func.now())

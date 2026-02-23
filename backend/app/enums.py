@@ -7,8 +7,18 @@ class RoleEnum(IntEnum):
 
 
 class Status(IntEnum):
-    authorized = 1
-    has_irregularities = 2
-    finalized = 3
-    finalized_prohibition = 4
-    finalized_partial_prohibition = 5
+    clear = 1
+    low = 2
+    moderate = 3
+    major = 4
+    critical = 5
+    finalized = 6
+    finalized_prohibition = 7
+    finalized_partial_prohibition = 8
+
+
+class Severity(IntEnum):
+    low = 1
+    moderate = 2
+    major = 3
+    critical = 4

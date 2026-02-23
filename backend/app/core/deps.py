@@ -1,3 +1,4 @@
+from app.services.irregularities import IrregularityService
 from fastapi import Depends
 from app.core.database import get_db
 from app.services.users import UserService
@@ -24,3 +25,10 @@ def get_inspection_service(
     db=Depends(get_db)
 ) -> InspectionService:
     return InspectionService(db=db)
+
+
+def get_irregularity_service(
+    db=Depends(get_db),
+    inspection_service: InspectionService = Depends(get_inspection_service)
+) -> IrregularityService:
+    return IrregularityService(db=db, inspection_service=inspection_service)

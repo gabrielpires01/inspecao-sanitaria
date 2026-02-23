@@ -6,24 +6,27 @@ from app.enums import Status
 
 class InspectionBase(BaseModel):
     establishment_id: int
-    inspector_id: int
     date_time: Optional[datetime] = None
-    status: Status = Status.authorized
+    status: Status = Status.clear
 
 
 class InspectionCreate(InspectionBase):
     pass
 
 
+class InspectionCreateService(InspectionBase):
+    inspector_id: int
+
+
 class InspectionUpdate(BaseModel):
     establishment_id: Optional[int] = None
-    inspector_id: Optional[int] = None
     status: Optional[Status] = None
 
 
 class InspectionResponse(InspectionBase):
     id: int
     created_at: datetime
+    inspector_id: int
 
     class Config:
         from_attributes = True
