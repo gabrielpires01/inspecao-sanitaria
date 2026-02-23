@@ -1,4 +1,5 @@
 from typing import List
+from app.models.inspection import FinalizationLog
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 from app.core.deps import get_inspection_service
@@ -8,7 +9,10 @@ from app.schemas.inspection import (
     InspectionCreate,
     InspectionCreateService,
     InspectionResponse,
-    LogResponse
+    LogResponse,
+    FinalizeInspectionResponse,
+    FinalizeInspectionService,
+    FinalizeInspection
 )
 
 router = APIRouter()
@@ -124,3 +128,37 @@ async def delete_inspection(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
+
+
+@router.post(
+    "/finalize/{inspection_id}",
+    response_model=FinalizeInspectionResponse,
+    status_code=status.HTTP_201_CREATED
+)
+async def finalize_inspection(
+    inspection_data: FinalizeInspection,
+    inspection_service: Session = Depends(get_inspection_service),
+    current_user: User = Depends(get_current_user)
+):
+    """Finaliza uma inspeção"""
+    dict_data = dict(inspection_data)
+
+    inspection = inspection_service.finalize_inspection(FinalizeInspectionService(
+        **dict_data,
+        inspector_id=current_user.id
+    ))
+    return inspection
+
+
+@router.get(
+    "/finalize/logs/{inspection_id}",
+    response_model=List[FinalizeInspectionResponse],
+)
+async def finalization_logs(
+    inspection_id: int,
+    inspection_service: Session = Depends(get_inspection_service),
+    current_user: User = Depends(get_current_user)
+):
+    """Busca logs de finalização da inspeção"""
+    inspection = inspection_service.get_finalization_logs_by_inspection(inspection_id)
+    return inspection

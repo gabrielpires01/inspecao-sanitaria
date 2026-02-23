@@ -46,4 +46,15 @@ class LogResponse(BaseModel):
 class FinalizeInspection(BaseModel):
     inspection_id: int
     status: FinalizeStatus
-    date_time: datetime
+    pending_issues: str
+
+
+class FinalizeInspectionService(FinalizeInspection):
+    inspector_id: int
+
+
+class FinalizeInspectionResponse(FinalizeInspectionService):
+    id: int
+
+    class Config:
+        from_attributes = True

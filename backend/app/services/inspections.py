@@ -1,10 +1,10 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from app.models.inspection import InspectionLog, Inspections
-from app.enums import Status
+from app.models.inspection import FinalizationLog, InspectionLog, Inspections
+from app.enums import Status, FinalizeStatus
 from app.schemas.inspection import (
-    FinalizeInspection,
+    FinalizeInspectionService,
     InspectionCreateService,
     InspectionUpdate,
     InspectionResponse
@@ -15,7 +15,7 @@ class InspectionService:
     def __init__(self, db: Session):
         self.db = db
 
-    def _is_finalized(self, status: Status) -> bool:
+    def is_finalized(self, status: Status) -> bool:
         """Verifica se o status indica que a inspeção está finalizada"""
         finalized_statuses = [
             Status.finalized,
@@ -85,7 +85,7 @@ class InspectionService:
         if not db_inspection:
             return None
 
-        if self._is_finalized(db_inspection.status):
+        if self.is_finalized(db_inspection.status):
             return ValueError(
                 "Não é permitido alterar inspeções finalizadas"
             )
@@ -113,7 +113,7 @@ class InspectionService:
         if not db_inspection:
             return False
 
-        if self._is_finalized(db_inspection.status):
+        if self.i | ValueErrors_finalized(db_inspection.status):
             raise ValueError(
                 "Não é permitido deletar inspeções finalizadas"
             )
@@ -144,5 +144,29 @@ class InspectionService:
         logs = self.db.scalars(stmt).all()
         return logs
 
-    def finalize_inspection(self, finalization_data: FinalizeInspection):
+    def finalize_inspection(self, finalization_data: FinalizeInspectionService):
         """Finaliza uma inspeção"""
+        log = FinalizationLog(**finalization_data.model_dump())
+
+        self.db.add(log)
+        status = Status.finalized
+        if log.status == FinalizeStatus.partial_prohibition:
+            status = Status.finalized_partial_prohibition
+        elif log.status == FinalizeStatus.prohibition:
+            status = Status.finalized_prohibition
+
+        self.update(log.inspection_id, InspectionUpdate(status=status))
+
+        self.db.commit()
+        self.db.refresh(log)
+        return log
+
+    def get_finalization_logs_by_inspection(self, inspection_id: int) -> List[FinalizationLog]:
+        """Busca logs de finalização por inspeção"""
+        stmt = (
+            select(FinalizationLog)
+            .where(FinalizationLog.inspection_id == inspection_id)
+        )
+
+        logs = self.db.scalars(stmt).all()
+        return logs

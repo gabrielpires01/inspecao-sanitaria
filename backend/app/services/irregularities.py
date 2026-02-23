@@ -107,11 +107,17 @@ class IrregularityService:
         self,
         irregularity_id: int,
         irregularity_data: IrregularityUpdate
-    ) -> Optional[IrregularityResponse]:
+    ) -> Optional[IrregularityResponse | ValueError]:
         """Atualiza uma irregularidade"""
         db_irregularity = self.db.get(Irregularities, irregularity_id)
         if not db_irregularity:
             return None
+
+        inspection = self.db.get(Inspections, db_irregularity.inspection_id)
+        if inspection and self.inspection_service.is_finalized(inspection.status):
+            raise ValueError(
+                "Não é permitido alterar após a inspeção ser finalizada"
+            )
 
         update_data = irregularity_data.model_dump(exclude_unset=True)
         old_severity = db_irregularity.severity
