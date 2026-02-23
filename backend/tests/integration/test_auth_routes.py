@@ -1,6 +1,3 @@
-"""
-Testes de integração para rotas de autenticação
-"""
 import pytest
 from fastapi import status
 
@@ -51,8 +48,8 @@ class TestAuthRoutes:
         """Testa login com credenciais válidas via API"""
         response = client.post(
             "/api/auth/login",
-            json={
-                "email": sample_user_data["email"],
+            data={
+                "username": sample_user_data["username"],
                 "password": sample_user_data["password"]
             }
         )
@@ -67,8 +64,8 @@ class TestAuthRoutes:
         """Testa login com credenciais inválidas via API"""
         response = client.post(
             "/api/auth/login",
-            json={
-                "email": sample_user_data["email"],
+            data={
+                "username": sample_user_data["username"],
                 "password": "senha_incorreta"
             }
         )

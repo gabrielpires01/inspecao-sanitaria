@@ -113,7 +113,7 @@ class InspectionService:
         if not db_inspection:
             return False
 
-        if self.i | ValueErrors_finalized(db_inspection.status):
+        if self.is_finalized(db_inspection.status):
             raise ValueError(
                 "Não é permitido deletar inspeções finalizadas"
             )

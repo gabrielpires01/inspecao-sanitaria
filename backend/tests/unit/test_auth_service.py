@@ -32,13 +32,14 @@ class TestAuthService:
 
     def test_login_success(self, db_session, sample_user, sample_user_data):
         """Testa login com credenciais válidas"""
-        from unittest.mock import MagicMock
+        from fastapi.security import OAuth2PasswordRequestForm
 
         auth_service = AuthService(db_session)
 
-        login_data = MagicMock()
-        login_data.email = sample_user_data["email"]
-        login_data.password = sample_user_data["password"]
+        login_data = OAuth2PasswordRequestForm(
+            username=sample_user_data["username"],
+            password=sample_user_data["password"]
+        )
         result = auth_service.login(login_data)
 
         assert result is not None
@@ -47,26 +48,30 @@ class TestAuthService:
         assert len(result["access_token"]) > 0
 
     def test_login_invalid_email(self, db_session, sample_user_data):
-        """Testa login com email inválido"""
-        from unittest.mock import MagicMock
+        """Testa login com username inválido"""
+        from fastapi.security import OAuth2PasswordRequestForm
 
         auth_service = AuthService(db_session)
-        login_data = MagicMock()
-        login_data.email = "email_inexistente@teste.com"
-        login_data.password = sample_user_data["password"]
+        login_data = OAuth2PasswordRequestForm(
+            username="username_inexistente",
+            password=sample_user_data["password"]
+        )
 
         result = auth_service.login(login_data)
 
         assert result is None
 
-    def test_login_invalid_password(self, db_session, sample_user, sample_user_data):
+    def test_login_invalid_password(
+        self, db_session, sample_user, sample_user_data
+    ):
         """Testa login com senha inválida"""
-        from unittest.mock import MagicMock
+        from fastapi.security import OAuth2PasswordRequestForm
 
         auth_service = AuthService(db_session)
-        login_data = MagicMock()
-        login_data.email = sample_user_data["email"]
-        login_data.password = "senha_incorreta"
+        login_data = OAuth2PasswordRequestForm(
+            username=sample_user_data["username"],
+            password="senha_incorreta"
+        )
 
         result = auth_service.login(login_data)
 

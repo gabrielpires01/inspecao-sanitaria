@@ -19,8 +19,7 @@ router = APIRouter()
 )
 async def register(
     user_data: UserCreate,
-    auth_service: Session = Depends(get_auth_service),
-    current_user: User = Depends(get_current_user)
+    auth_service: Session = Depends(get_auth_service)
 ):
     """Registra um novo usuário"""
 

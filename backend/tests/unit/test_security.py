@@ -58,7 +58,7 @@ class TestSecurity:
             detail="Token inválido"
         )
 
-        email = verify_token(token, credentials_exception)
+        email, role = verify_token(token, credentials_exception)
         assert email == "test@example.com"
 
     def test_verify_token_invalid(self):

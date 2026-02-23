@@ -34,7 +34,8 @@ class TestUserService:
             user = User(
                 email=fake.email(),
                 hashed_password="hashed_password",
-                full_name=fake.name()
+                full_name=fake.name(),
+                username=fake.user_name()
             )
             db_session.add(user)
         db_session.commit()
