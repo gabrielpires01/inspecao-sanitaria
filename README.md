@@ -177,7 +177,13 @@ inspecao-sanitária/
    docker-compose up -d
    ```
 
-4. **Acesse os serviços:**
+4. **Execute as migrações do banco de dados:**
+   ```bash
+   docker-compose exec backend alembic upgrade head
+   ```
+   ⚠️ **Importante**: As migrações do Alembic devem ser executadas após iniciar os containers para criar e atualizar as tabelas do banco de dados.
+
+5. **Acesse os serviços:**
    - **Backend API**: http://localhost:8000
    - **Swagger UI**: http://localhost:8000/docs
    - **ReDoc**: http://localhost:8000/redoc
@@ -203,6 +209,15 @@ docker-compose exec backend bash
 
 # Executar comandos no frontend
 docker-compose exec frontend sh
+
+# Executar migrações do Alembic
+docker-compose exec backend alembic upgrade head
+
+# Criar nova migration
+docker-compose exec backend alembic revision --autogenerate -m "descrição da migration"
+
+# Reverter última migration
+docker-compose exec backend alembic downgrade -1
 ```
 
 ## 🔐 Autenticação
@@ -228,6 +243,11 @@ source venv/bin/activate  # Linux/Mac
 # ou
 venv\Scripts\activate  # Windows
 pip install -r requirements.txt
+
+# Execute as migrações do banco de dados
+alembic upgrade head
+
+# Inicie o servidor
 uvicorn app.main:app --reload
 ```
 
